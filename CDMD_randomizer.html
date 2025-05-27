@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cthulhu: Death May Die (RNG)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      position: relative;
+      min-height: 100vh;
+      /* No background or watermark styles here */
+    }
+
+    #gameGrid {
+      margin-top: 30px;  
+      display: grid;
+      grid-template-rows: auto auto auto auto;
+      gap: 40px;
+    }
+
+    #playersGrid, #relicSection {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 10px;
+    }
+
+    .player-output, .relic-output {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1em;
+    }
+
+    /* Images same size */
+    #gameGrid img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      border: none;
+    }
+
+    em.bold-italic {
+      font-style: italic;
+      font-weight: bold;
+    }
+
+    .relic-output strong {
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      #playersGrid, #relicSection {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 8px;
+      }
+
+      #gameGrid img {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Cthulhu: Death May Die (RNG)</h1>
+
+  <div class="section">
+    <label>Number of players (1–5): 
+      <input type="number" id="numPlayers" min="1" max="5" value="3" />
+    </label>
+  </div>
+
+  <div class="section">
+    <button onclick="generate()">Generate</button>
+  </div>
+
+  <div id="gameGrid">
+    <div id="playersGrid"></div>
+    <div id="relicSection"></div>
+    <div id="bossSection"></div>
+    <div id="episodeSection"></div>
+  </div>
+
+  <script>
+    const words1to20 = [
+      "Lord Adam Benchley", "Ahmed Yasin", "Borden", "Elizabeth Ives", "Fatima Safar",
+      "Sergeant Ian Welles", "John Morgan", "Rasputin", "Sister Beth", "The Kid",
+      "Adilah Vidal", "Alex Parker", "Ariele Venturi", "Hailia Hovath", "Father Luke",
+      "Margarethe Richter", "Sergeant Mario Braghieri", "Mary Diaz", "Sam Wood", "Mate Tony Boyle"
+    ];
+
+    const words1to4 = ["Cthulhu", "Hastur", "Black Goat of the Woods", "Yog-Sothoth"];
+
+    const episodes1to12 = [
+      "S01E01 - Alquimia Blasfema", "S01E02 - Tomos da Loucura", "S01E03 - Dança Macabra", "S01E04 - Ídolos Sobrenaturais", "S01E05 - Maré Amaldiçoada", "S01E06 - Hora Inominável",
+      "S02E01 - Companheiros Estranhos", "S02E02 - Floresta sem Nome", "S02E03 - Sanctificetur Nomen", "S02E04 - Tiroteiro no H.P. Corral", "S02E05 - Monstros na Cidade do Pecado", "S02E06 - A Última Cena"
+    ];
+
+    const relics1to22 = [
+      "Skull", "Pumpkin", "Ivory Figure", "Skull Bracelet", "Viol", "Wooden Pipe", "Ritual Dagger", "Glowing Ring", "Old Rosary", "Handheld Magnifier", "Sinister Book", "Jade Amulet", "Replica Blade", "Runecarved Spear", "Shiny Jewel", "Ancient Idol", "Lucky Coin", "Mysterious Key", "Ritual Mask", "Crystal Ball", "Brass Compass", "Ruby Talisman"
+    ];
+
+    function sanitizeFileName(name) {
+      return name.toLowerCase()
+                 .replace(/[’'"]/g, '')
+                 .replace(/\s+/g, '_')
+                 .replace(/[^a-z0-9_-]/g, '');
+    }
+
+    function getWord(num, wordList) {
+      return wordList[num - 1] || num;
+    }
+
+    function generate() {
+      const numPlayers = parseInt(document.getElementById("numPlayers").value);
+      if (isNaN(numPlayers) || numPlayers < 1 || numPlayers > 5) {
+        alert("Please enter a number between 1 and 5.");
+        return;
+      }
+
+      const playersGrid = document.getElementById("playersGrid");
+      const relicSection = document.getElementById("relicSection");
+      const bossSection = document.getElementById("bossSection");
+      const episodeSection = document.getElementById("episodeSection");
+
+      playersGrid.innerHTML = "";
+      relicSection.innerHTML = "";
+      bossSection.innerHTML = "";
+      episodeSection.innerHTML = "";
+
+      const used = [];
+
+      // Generate players
+      for (let i = 0; i < numPlayers; i++) {
+        const remaining = Array.from({ length: 20 }, (_, j) => j + 1).filter(n => !used.includes(n));
+        const idx = Math.floor(Math.random() * remaining.length);
+        const selected = remaining[idx];
+        used.push(selected);
+
+        const name = getWord(selected, words1to20);
+        const fileName = sanitizeFileName(name) + '.png';
+
+        const playerDiv = document.createElement('div');
+        playerDiv.className = 'player-output';
+
+        const img = document.createElement('img');
+        img.src = 'assets/' + fileName;
+        img.alt = name;
+        img.onerror = () => { img.style.display = 'none'; };
+
+        const textSpan = document.createElement('span');
+        textSpan.innerHTML = `P<strong>${i + 1}</strong>: <em class="bold-italic">${name}</em>`;
+
+        playerDiv.appendChild(img);
+        playerDiv.appendChild(textSpan);
+
+        playersGrid.appendChild(playerDiv);
+      }
+
+      // Generate relics
+      const usedRelics = [];
+      for (let i = 0; i < numPlayers; i++) {
+        const remainingRelics = Array.from({ length: 22 }, (_, j) => j + 1).filter(n => !usedRelics.includes(n));
+        const idx = Math.floor(Math.random() * remainingRelics.length);
+        const relicNum = remainingRelics[idx];
+        usedRelics.push(relicNum);
+
+        const relicName = getWord(relicNum, relics1to22);
+        const relicFile = sanitizeFileName(relicName) + '.png';
+
+        const relicDiv = document.createElement('div');
+        relicDiv.className = 'relic-output';
+
+        const img = document.createElement('img');
+        img.src = 'assets/' + relicFile;
+        img.alt = relicName;
+        img.onerror = () => { img.style.display = 'none'; };
+
+        const label = document.createElement('span');
+        label.innerHTML = `P<strong>${i + 1}</strong>: <em class="bold-italic">${relicName}</em>`;
+
+        relicDiv.appendChild(img);
+        relicDiv.appendChild(label);
+        relicSection.appendChild(relicDiv);
+      }
+
+      // Generate boss
+      const bossNum = Math.floor(Math.random() * 4) + 1;
+      const bossName = getWord(bossNum, words1to4);
+      const bossFile = sanitizeFileName(bossName) + '.png';
+
+      const bossDiv = document.createElement('div');
+      bossDiv.className = 'player-output';
+
+      const bossImg = document.createElement('img');
+      bossImg.src = 'assets/' + bossFile;
+      bossImg.alt = bossName;
+      bossImg.onerror = () => { bossImg.style.display = 'none'; };
+
+      const bossSpan = document.createElement('span');
+      bossSpan.innerHTML = `Chefe: <em class="bold-italic">${bossName}</em>`;
+
+      bossDiv.appendChild(bossImg);
+      bossDiv.appendChild(bossSpan);
+      bossSection.appendChild(bossDiv);
+
+      // Generate episode
+      const epNum = Math.floor(Math.random() * 12) + 1;
+      const epFull = getWord(epNum, episodes1to12);
+      const epCode = epFull.split(" ")[0];
+      const epFile = epCode.toLowerCase() + '.png';
+
+      const epDiv = document.createElement('div');
+      epDiv.className = 'player-output';
+
+      const epImg = document.createElement('img');
+      epImg.src = 'assets/' + epFile;
+      epImg.alt = epCode;
+      epImg.onerror = () => { epImg.style.display = 'none'; };
+
+      const epSpan = document.createElement('span');
+      epSpan.innerHTML = `Episódio: <em class="bold-italic">${epFull}</em>`;
+
+      epDiv.appendChild(epImg);
+      epDiv.appendChild(epSpan);
+      episodeSection.appendChild(epDiv);
+    }
+  </script>
+</body>
+</html>
