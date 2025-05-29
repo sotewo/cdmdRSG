@@ -28,13 +28,16 @@
       margin-bottom: 20px;
     }
 
-    input[type="number"] {
+    select#numPlayers {
       padding: 5px;
       font-size: 1em;
       border: 1px solid #555;
       border-radius: 5px;
       background-color: #222;
       color: #eee;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
     }
 
     button {
@@ -53,9 +56,25 @@
       background-color: #5c3d3d;
     }
 
+    /* Bigger button on mobile */
+    @media (max-width: 600px) {
+      button {
+        padding: 16px 32px;
+        font-size: 1.3em;
+      }
+      
+      select#numPlayers {
+        font-size: 1.2em;
+        padding: 6px 10px;
+        border-radius: 5px;
+        background-color: #222;
+        color: #eee;
+        border: 1px solid #555;
+      }
+    }
+
     #gameGrid {
       display: none;
-      /* your existing styles below */
       margin-top: 30px;
       flex-direction: column;
       gap: 30px;
@@ -135,8 +154,14 @@
   <h1>Cthulhu: Death May Die (RNG)</h1>
 
   <div class="section">
-    <label>Number of players (1–5): 
-      <input type="number" id="numPlayers" min="1" max="5" value="3" />
+    <label>Number of players (1–5):
+      <select id="numPlayers">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3" selected>3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
     </label>
   </div>
 
@@ -193,12 +218,12 @@
     function generate() {
       const numPlayers = parseInt(document.getElementById("numPlayers").value);
       if (isNaN(numPlayers) || numPlayers < 1 || numPlayers > 5) {
-        alert("Please enter a number between 1 and 5.");
+        alert("Please select a number between 1 and 5.");
         return;
       }
 
       document.getElementById("gameGrid").style.display = "flex";
-	  
+      
       const playerResults = document.getElementById("playerResults");
       const episodeSection = document.getElementById("episodeSection");
       const bossSection = document.getElementById("bossSection");
