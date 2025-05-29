@@ -5,27 +5,71 @@
   <title>Cthulhu: Death May Die (RNG)</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      position: relative;
-      min-height: 100vh;
+      font-family: 'Georgia', serif;
+      background-color: #0e0e0e;
+      color: #d6d2c4;
+      margin: 0;
+      padding: 20px;
+      background-image: radial-gradient(#1b1b1b 1px, transparent 1px), radial-gradient(#1b1b1b 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      text-align: center;
+      margin-bottom: 30px;
+      color: #b0a06f;
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    .section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="number"] {
+      padding: 5px;
+      font-size: 1em;
+      border: 1px solid #555;
+      border-radius: 5px;
+      background-color: #222;
+      color: #eee;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #3c2c2c;
+      border: none;
+      border-radius: 8px;
+      color: #f5f5f5;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0,0,0,0.5);
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #5c3d3d;
     }
 
     #gameGrid {
+      display: none;
+      /* your existing styles below */
       margin-top: 30px;
-      display: grid;
-      grid-template-rows: auto auto auto auto;
-      gap: 40px;
+      flex-direction: column;
+      gap: 30px;
     }
 
     .player-box {
       border: 2px solid #444;
-      padding: 10px;
+      padding: 15px;
       border-radius: 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      background-color: #f7f7f7;
+      gap: 12px;
+      background-color: #1c1c1c;
+      box-shadow: 0 0 10px #00000099;
     }
 
     #playerResults {
@@ -45,13 +89,34 @@
       width: 100px;
       height: 100px;
       object-fit: contain;
-      border: none;
+      border-radius: 6px;
     }
 
     em.bold-italic {
       font-style: italic;
       font-weight: bold;
+      color: #e2d7a7;
     }
+
+    .game-info-row {
+      display: flex;
+      justify-content: flex-start;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .info-container {
+      border: 2px solid #444;
+      padding: 15px;
+      border-radius: 12px;
+      background-color: #1c1c1c;
+      box-shadow: 0 0 10px #00000099;
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
 
     @media (max-width: 600px) {
       #gameGrid img {
@@ -81,8 +146,12 @@
 
   <div id="gameGrid">
     <div id="playerResults"></div>
-    <div id="bossSection"></div>
-    <div id="episodeSection"></div>
+    <div class="game-info-row">
+      <div class="info-container">
+        <div id="episodeSection"></div>
+        <div id="bossSection"></div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -128,13 +197,15 @@
         return;
       }
 
+      document.getElementById("gameGrid").style.display = "flex";
+	  
       const playerResults = document.getElementById("playerResults");
-      const bossSection = document.getElementById("bossSection");
       const episodeSection = document.getElementById("episodeSection");
+      const bossSection = document.getElementById("bossSection");
 
       playerResults.innerHTML = "";
-      bossSection.innerHTML = "";
       episodeSection.innerHTML = "";
+      bossSection.innerHTML = "";
 
       const used = [];
       const usedRelics = [];
@@ -158,7 +229,7 @@
         img.alt = name;
         img.onerror = () => { img.style.display = "none"; };
         const textSpan = document.createElement("span");
-        textSpan.innerHTML = `Investigator: <em class="bold-italic">${name}</em>`;
+        textSpan.innerHTML = `Investigator:<br><em class="bold-italic">${name}</em>`;
         playerDiv.appendChild(img);
         playerDiv.appendChild(textSpan);
         box.appendChild(playerDiv);
@@ -176,7 +247,7 @@
         relicImg.alt = relicName;
         relicImg.onerror = () => { relicImg.style.display = "none"; };
         const relicLabel = document.createElement("span");
-        relicLabel.innerHTML = `Relic: <em class="bold-italic">${relicName}</em>`;
+        relicLabel.innerHTML = `Relic:<br><em class="bold-italic">${relicName}</em>`;
         relicDiv.appendChild(relicImg);
         relicDiv.appendChild(relicLabel);
         box.appendChild(relicDiv);
@@ -194,30 +265,13 @@
         pathologyImg.alt = pathologyName;
         pathologyImg.onerror = () => { pathologyImg.style.display = "none"; };
         const pathologyLabel = document.createElement("span");
-        pathologyLabel.innerHTML = `Pathology: <em class="bold-italic">${pathologyName}</em>`;
+        pathologyLabel.innerHTML = `Pathology:<br><em class="bold-italic">${pathologyName}</em>`;
         pathologyDiv.appendChild(pathologyImg);
         pathologyDiv.appendChild(pathologyLabel);
         box.appendChild(pathologyDiv);
 
         playerResults.appendChild(box);
       }
-
-      // Boss
-      const bossNum = Math.floor(Math.random() * 4) + 1;
-      const bossName = getWord(bossNum, words1to4);
-      const bossFile = sanitizeFileName(bossName) + ".png";
-
-      const bossDiv = document.createElement("div");
-      bossDiv.className = "player-output";
-      const bossImg = document.createElement("img");
-      bossImg.src = "assets/" + bossFile;
-      bossImg.alt = bossName;
-      bossImg.onerror = () => { bossImg.style.display = "none"; };
-      const bossSpan = document.createElement("span");
-      bossSpan.innerHTML = `Boss: <em class="bold-italic">${bossName}</em>`;
-      bossDiv.appendChild(bossImg);
-      bossDiv.appendChild(bossSpan);
-      bossSection.appendChild(bossDiv);
 
       // Episode
       const epNum = Math.floor(Math.random() * 12) + 1;
@@ -232,10 +286,27 @@
       epImg.alt = epCode;
       epImg.onerror = () => { epImg.style.display = "none"; };
       const epSpan = document.createElement("span");
-      epSpan.innerHTML = `Episode: <em class="bold-italic">${epFull}</em>`;
+      epSpan.innerHTML = `Episode:<br><em class="bold-italic">${epFull}</em>`;
       epDiv.appendChild(epImg);
       epDiv.appendChild(epSpan);
       episodeSection.appendChild(epDiv);
+
+      // Boss
+      const bossNum = Math.floor(Math.random() * 4) + 1;
+      const bossName = getWord(bossNum, words1to4);
+      const bossFile = sanitizeFileName(bossName) + ".png";
+
+      const bossDiv = document.createElement("div");
+      bossDiv.className = "player-output";
+      const bossImg = document.createElement("img");
+      bossImg.src = "assets/" + bossFile;
+      bossImg.alt = bossName;
+      bossImg.onerror = () => { bossImg.style.display = "none"; };
+      const bossSpan = document.createElement("span");
+      bossSpan.innerHTML = `Boss:<br><em class="bold-italic">${bossName}</em>`;
+      bossDiv.appendChild(bossImg);
+      bossDiv.appendChild(bossSpan);
+      bossSection.appendChild(bossDiv);
     }
   </script>
 </body>
