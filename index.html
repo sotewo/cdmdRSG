@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Choose a Game</title>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background-color: #0e0e0e;
+      color: #d6d2c4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-image: radial-gradient(#1b1b1b 1px, transparent 1px), radial-gradient(#1b1b1b 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+    }
+
+    h1 {
+      font-size: 2em;
+      color: #b0a06f;
+      margin-bottom: 30px;
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    select, button {
+      padding: 10px;
+      font-size: 1em;
+      margin: 10px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background-color: #222;
+      color: #eee;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #3c2c2c;
+      border: none;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    }
+
+    button:hover {
+      background-color: #5c3d3d;
+    }
+  </style>
+</head>
+<body>
+  <h1>Select a Game</h1>
+
+  <label for="gameSelect">Choose your game:</label>
+  <select id="gameSelect">
+    <option value="">-- Select --</option>
+    <option value="cthulhu">Cthulhu: Death May Die</option>
+    <option value="ozob">Ozob: A Cyberpunk Board Game</option>
+  </select>
+
+  <button onclick="goToGame()">Continue</button>
+
+  <script>
+    function goToGame() {
+      const game = document.getElementById("gameSelect").value;
+      if (!game) {
+        alert("Please select a game.");
+        return;
+      }
+
+      if (game === "cthulhu") {
+        window.location.href = "cthulhu.html"; // Your original generator page
+      } else if (game === "ozob") {
+        alert("Ozob generator is under construction."); // Placeholder
+      }
+    }
+  </script>
+</body>
+</html>
